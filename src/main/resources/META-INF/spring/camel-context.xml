@@ -32,51 +32,18 @@
   </bean>
 
   <camelContext trace="true" xmlns="http://camel.apache.org/schema/spring">
-<!--  <route id="hl7TcpRoute">
-    <from uri="mina2:tcp://localhost:8888?sync=true&amp;codec=#hl7codec"/>
-    <to uri="direct:hl7Direct"/>
-  </route>-->
   <route id="hl7FileRoute">
     <from uri="file:///tmp/?delete=true&amp;moveFailed=.error&amp;filter=#hl7FileFilter"/>
-    <!--<setBody>
-      <header>CamelFileAbsolutePath</header>
-    </setBody>-->
     <to uri="direct:hl7Direct"/>
   </route>
+  
   <route id="hl7DirectRoute">
     <from uri="direct:hl7Direct"/>
     <log message="HL7 Request: ${body}"/>
-<!--    <unmarshal>
-      <hl7 validate="true"/>
-    </unmarshal>-->
-    <!--<to uri="direct:hl7DirectCBR"/>-->
     <bean ref="hl7MapForceTransformer"/>
     <log message="Finished transforming"/>
     <to uri="file:///tmp/CustomReport"/>
-
-<!--    <marshal>
-      <hl7 validate="true"/>
-    </marshal>-->
-    <!--<log message="trying to marshall: ${body}"/>-->
-    <!--<log message="HL7 Response: ${body}"/>-->
-    <!--<to uri="mock:hl7DirectResponse"/>-->
   </route>
-<!--  <route id="hl7DirectCBRRoute">
-    <from uri="direct:hl7DirectCBR"/>
-    <choice>
-      <when>
-        <groovy>request?.body?.MSH?.sendingApplication?.namespaceID.value == 'FUSEDEMO'</groovy>
-        <log message="Transforming message."/>
-        <transform>
-          <groovy>adt = request?.body; adt?.PID?.removePatientName(0); request.body = adt;</groovy>
-        </transform>
-        <log message="HL7 Transformed Request: ${body}"/>
-      </when>
-      <otherwise>
-        <log message="No transformation necessary."/>
-      </otherwise>
-    </choice>
-  </route>-->
 </camelContext>
 
 </beans>
